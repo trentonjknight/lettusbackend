@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Person(db.Model):
+    __tablename__ = 'person'
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(20))
     lname = db.Column(db.String(20))
@@ -11,6 +12,8 @@ class Person(db.Model):
     password = db.Column(db.String(30))
     registration_time = db.Column(db.Integer)
     profile_image = db.Column(db.String(120))
+
+    monitors = db.relationship('Monitor', back_populates='person')
 
     def __repr__(self):
         return '<Person %r>' % self.fname
@@ -23,11 +26,12 @@ class Person(db.Model):
             "phone": self.phone,
             "password": self.password,
             "registration_time": self.registration_time,
-            "profile_image": self.profile_image
-
+            "profile_image": self.profile_image,
+            "monitor": [x.serialize() for x in self.monitors]
         }
 
 class Plant(db.Model):
+    __tablename__ = 'plant'
     id = db.Column(db.Integer, primary_key= True)
     name = db.Column(db.String(60), unique= True)
     days_to_maturity = db.Column(db.Integer)
@@ -43,6 +47,8 @@ class Plant(db.Model):
     edible = db.Column(db.String(20))
     description = db.Column(db.String(120))
     pairings = db.Column(db.String(120))
+
+    monitors = db.relationship("Monitor", back_populates='plant')
 
     def __repr__(self):
         return '<Plant %r>' % self.name
@@ -62,7 +68,21 @@ class Plant(db.Model):
             "mat_height": self.mat_height,
             "edible": self.edible,
             "description": self.description,
-            "pairings": self.pairings
+            "pairings": self.pairings,
+            "monitor": [x.serialize() for x in self.monitors]
 
         }
 
+class Monitor(db.Model):
+    __tablename__ = 'monitor'
+    id = db.Column(db.Integer, primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+    plant_id = db.Column(db.Integer, db.ForeignKey('plant.id'))
+    temp = db.Column(db.Integer)
+    ph = db.Column(db.Integer)
+    humidity = db.Column(db.Integer)
+    crop = db.Column(db.Integer)
+    day = db.Column(db.Integer)
+
+    person = db.relationship('Person', back_populates='monitors')
+    plant = db.relationship('Plant', back_populates='monitors')
