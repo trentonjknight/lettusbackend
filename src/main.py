@@ -8,8 +8,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db
-#from models import Person
+from models import db, Person
 
 
 app = Flask(__name__)
@@ -30,6 +29,42 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
+
+@app.route('/register', methods=['POST'])
+def handle_register():
+
+    body = request.get_json()
+
+    if 'fname' not in body:
+        raise APIException('fname missing from body', 400)
+    if 'lname' not in body:
+        raise APIException('lname missing from body', 400)
+    if 'email' not in body:
+        raise APIException('email missing from body', 400)
+    if 'phone' not in body:
+        raise APIException('phone missing from body', 400)
+    if 'password' not in body:
+        raise APIException('password missing from body', 400)
+
+    person = Person(
+        fname = body['fname'],
+        lname = body['lname'],
+        email = body['email'],
+        phone = body['phone'],
+        password = body['password']
+    )
+    db.session.add(person)
+    db.session.commit()
+
+    person = Person.query.filter_by(email=body['email']).first()
+    if not person:
+        raise APIException('Person not found')
+
+    return jsonify(person.serialize())
+
+
+
 @app.route('/get_plant', methods=['POST'])
 def handle_hello():
 
@@ -42,6 +77,17 @@ def handle_hello():
     data = response.json()
 
     return jsonify({'data': data})
+
+
+
+@app.route('/test')
+def test():
+
+    person = Person.query.filter_by(email='ooohhh').first()
+    if not person:
+        raise APIException('Person not found')
+    return jsonify(person.serialize())
+    return jsonify({'msg':'exactly'})
 
 
 
