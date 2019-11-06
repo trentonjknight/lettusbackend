@@ -86,3 +86,17 @@ class Monitor(db.Model):
 
     person = db.relationship('Person', back_populates='monitors')
     plant = db.relationship('Plant', back_populates='monitors')
+
+    def __repr__(self):
+        return '<Monitor %r>' % self.id
+
+    def serialize(self):
+        return{
+            "person_id": self.person_id,
+            "plant_id": self.plant_id,
+            "temp": self.temp,
+            "ph": self.ph,
+            "humidity": self.humidity,
+            "crop": self.crop,
+            "day": self.day
+        }
