@@ -8,8 +8,10 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from models import db, Person
-
+from models import db, Person, Plant, Monitor
+from flask_jwt_simple import (
+    JWTManager, jwt_required, create_jwt, get_jwt_identity
+)
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -18,6 +20,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
+
+
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_KEY')
+jwt = JWTManager(app)
+
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -52,7 +59,7 @@ def handle_register():
         lname = body['lname'],
         email = body['email'],
         phone = body['phone'],
-        password = body['password']
+        password = hash(body['password'])
     )
     db.session.add(person)
     db.session.commit()
@@ -62,6 +69,29 @@ def handle_register():
         raise APIException('Person not found')
 
     return jsonify(person.serialize())
+
+
+
+@app.route('/login', methods=['POST'])
+def handle_login():
+
+    body = request.get_json()
+
+    if 'email' not in body:
+        raise APIException('email missing from body', 400)
+    if 'password' not in body:
+        raise APIException('password missing from body', 400)
+
+    user = Person.query.filter_by(email=body['email'], password=hash(body['password'])).first()
+
+    if user is None:
+        raise APIException('user not found', 404)
+
+    return jsonify({
+        'token': create_jwt(identity=username),
+        'user': user.serialize()
+    }), 200
+
 
 
 
