@@ -59,7 +59,7 @@ def handle_register():
         lname = body['lname'],
         email = body['email'],
         phone = body['phone'],
-        password = hash(body['password'])
+        password = body['password']
     )
     db.session.add(person)
     db.session.commit()
@@ -82,13 +82,13 @@ def handle_login():
     if 'password' not in body:
         raise APIException('password missing from body', 400)
 
-    user = Person.query.filter_by(email=body['email'], password=hash(body['password'])).first()
+    user = Person.query.filter_by(email=body['email'], password=body['password']).first()
 
     if user is None:
         raise APIException('user not found', 404)
 
     return jsonify({
-        'token': create_jwt(identity=username),
+        'token': create_jwt(identity=body['email']),
         'user': user.serialize()
     }), 200
 

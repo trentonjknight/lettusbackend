@@ -83,6 +83,8 @@ class Monitor(db.Model):
     humidity = db.Column(db.Integer)
     crop = db.Column(db.Integer)
     day = db.Column(db.Integer)
+    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.DateTime)
 
     person = db.relationship('Person', back_populates='monitors')
     plant = db.relationship('Plant', back_populates='monitors')
