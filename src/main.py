@@ -115,9 +115,27 @@ def handle_hello():
 @app.route('/test')
 def test():
 
-    send_sms('colbilitooooo')
+    send_sms('LETTUS reminding you to water your plants and turn on the light!')
 
     return jsonify({'msg':'message sent!'})
+
+
+
+@app.route('/sendmsg', methods=['POST'])
+def notification():
+
+    body = request.get_json()
+    
+    if 'message' not in body:
+        raise APIException('must specify message in body', 400)
+
+    send_sms(body['message'])
+    
+    return jsonify({'msg':'message sent!'})
+
+
+
+
 
 
 @app.route("/monitor/<int:id>", methods=['POST'])
