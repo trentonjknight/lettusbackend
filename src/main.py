@@ -12,6 +12,8 @@ from models import db, Person, Plant, Monitor
 from flask_jwt_simple import (
     JWTManager, jwt_required, create_jwt, get_jwt_identity
 )
+from send_sms import send_msg
+from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False

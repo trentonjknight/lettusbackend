@@ -19,6 +19,7 @@ gunicorn = "*"
 mysqlclient = "*"
 requests = "*"
 flask-jwt-simple = "*"
+twilio = "*"
 
 [requires]
 python_version = "3.6"
