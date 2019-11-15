@@ -12,7 +12,7 @@ from models import db, Person, Plant, Monitor
 from flask_jwt_simple import (
     JWTManager, jwt_required, create_jwt, get_jwt_identity
 )
-from send_sms import send_msg
+from send_sms import send_sms
 from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
@@ -115,13 +115,17 @@ def handle_hello():
 @app.route('/test')
 def test():
 
-    person = Person.query.filter_by(email='ooohhh').first()
-    if not person:
-        raise APIException('Person not found')
-    return jsonify(person.serialize())
-    return jsonify({'msg':'exactly'})
+    send_sms('colbilitooooo')
+
+    return jsonify({'msg':'message sent!'})
 
 
+@app.route("/monitor/<int:id>", methods=['POST'])
+def harvest_msg(id):
+    harvest = Monitor.query.get(id)
+    if not harvest:
+        raise APIException("not found")
+    return jsonify(harvest.serialize())
 
 
 # this only runs if `$ python src/main.py` is executed
