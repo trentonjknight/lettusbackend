@@ -11,7 +11,7 @@ def send_sms(msg):
     message = client.messages \
                     .create(
                         body=msg,
-                        from_='+16198212180',
+                        from_='+13346058062',
                         to='+13053324995'
                     )
 
